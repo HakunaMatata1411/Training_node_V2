@@ -74,3 +74,23 @@ hình đại diện --> avart
 role: --> groups_id, groups_name -- =//
 
 price product
+
+
+controller --> điều hướng --> view (client) 
+
+models --> services 
+
+
+dev Job --> job phụ
+Job: chính ABC + task (phụ) --> nhanh, nhanh 
+KH cũ --> leader: nâng cấp, lỗi
+
+Phản ứng (nắm bắt khi có task): 
+Hỏi --> có task và task gì?, 
+Hỏi ---> phải làm sao, .... , xử lí, cấu trúc,
+dev ---> cực thích --> review (nâng lương) 
+
+console.log(Hello world)
+system.out.println(...)
+
+Hỏi --> Gg (search)

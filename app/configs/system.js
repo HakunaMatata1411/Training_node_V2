@@ -1,4 +1,6 @@
 module.exports = {
-    prefixAdmin: 'adminHHH',
-    formatTime: 'DD-MM-YYYY'
+    prefixAdmin: 'admin',
+    prefixFrontend:'',
+    formatTime: 'DD-MM-YYYY',
+    env: 'dev'
 }

@@ -1,39 +1,138 @@
-
-const multer  = require('multer');
+var multer  = require('multer');
 var randomstring = require("randomstring");
-const path = require('path'); 
+const path = require('path');
+const fs    = require('fs'); 
+const notifyConfig  		= require(__path_configs + 'notify');
 
-const uploadFile = (field,folderDes = 'users',fileNameLength = 10, fileSizeMb = 1, fileExtension = 'jpeg|jpg|png|gif') =>{
+let uploadFile = (field, folderDes = 'users', fileNameLength = 10, fileSizeMb = 5, fileExtension = 'jpeg|jpg|png|gif') => {
+		const storage = multer.diskStorage({
+			destination: (req, file, cb) => {
+				cb(null, __path_uploads + folderDes + '/')
+			},
+			filename: (req, file, cb) =>  {
+				cb(null,  randomstring.generate(fileNameLength) + Date.now() + path.extname(file.originalname));
+			}
+		});
 
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, __path_uploads + folderDes +'/' )
-    },
-  
-    filename: function (req, file, cb) {
-      cb(null, randomstring.generate(fileNameLength) + path.extname(file.originalname))
-    }
-  })
-  
-  const upload = multer({ 
-    storage: storage,
-    limits: { fileSize: fileSizeMb * 1024 * 1024 }, //bit --> 1MB
-    fileFilter: function (req, file, cb) {
-      const fileTypes = new RegExp(fileExtension)
-      const extname = fileTypes.test(path.extname(file.originalname).toLowerCase())
-      const mimetype = fileTypes.test(file.mimetype)
-  
-      if (mimetype && extname) {
-        return cb(null, true)
-      } else{
-        return cb(notifyConfig.ERROR_UPLOAD_FILE)
-      }
-  }
-   }).single(field)
+	const upload = multer({ 
+		storage: storage,
+		limits: {
+			fileSize: fileSizeMb * 1024 * 1024,
+		},
+		fileFilter: (req, file, cb) => {
+		
+			const filetypes = new RegExp(fileExtension);
+			const extname 	= filetypes.test(path.extname(file.originalname).toLowerCase());
+			const mimetype  = filetypes.test(file.mimetype);
+	
+			if(mimetype && extname){
+				return cb(null,true);
+			}
+			else {
+				cb(notifyConfig.ERROR_FILE_EXTENSION);
+			}	
+			return cb(null,false);		
+		}
+	}).single(field);
 
-   return upload
+	return upload;
 }
 
-module.exports ={
-  upload: uploadFile
+let uploadFileSetting = (field, folderDes = 'users', fileNameLength = 10, fileSizeMb = 5, fileExtension = 'jpeg|jpg|png|gif') => {
+	const storage = multer.diskStorage({
+		destination: (req, file, cb) => {
+			cb(null, __path_uploads + folderDes + '/')
+		},
+		filename: (req, file, cb) =>  {
+			cb(null, file.fieldname.toLowerCase()  + path.extname(file.originalname));
+		}
+	});
+
+const upload = multer({ 
+	storage: storage,
+	limits: {
+		fileSize: fileSizeMb * 1024 * 1024,
+	},
+	fileFilter: (req, file, cb) => {
+		const filetypes = new RegExp(fileExtension);
+		const extname 	= filetypes.test(path.extname(file.originalname).toLowerCase());
+		const mimetype  = filetypes.test(file.mimetype);
+
+		if(mimetype && extname){
+			return cb(null,true);
+		}
+		else {
+			cb(notifyConfig.ERROR_FILE_EXTENSION);
+		}	
+		return cb(null,false);		
+	}
+}).fields(field);
+
+return upload;
+}
+
+let removeFile = (folder, fileName) => {
+	if(fileName != "" && fileName != undefined ){
+		let path = folder + fileName;
+		if (fs.existsSync(path))   fs.unlinkSync(path, (err) => {if (err) throw err;});
+	}
+}
+
+let removeFileSetting = (folder, fileName, mainname) => {
+	if(fileName != "" && fileName != undefined ){
+		let path = folder + fileName;
+		if (fs.existsSync(path))   {
+			try {
+				fs.unlinkSync(path);
+				let originalname = fileName.slice(8)
+				fs.renameSync(`public/uploads/${mainName}/${key}`, `public/uploads/${mainName}/uploaded${
+					value[0].filename
+				}`)
+				return true;
+			 } catch (e) {
+				return false;
+			 }
+		}
+	}
+}
+
+let uploadFileMulti = (field, folderDes = 'users', fileNameLength = 10, fileSizeMb = 10, fileExtension = 'jpeg|jpg|png|gif') => {
+	const storage = multer.diskStorage({
+		destination: (req, file, cb) => {
+			cb(null, __path_uploads + folderDes + '/')
+		},
+		filename: (req, file, cb) =>  {
+			cb(null,  randomstring.generate(fileNameLength) + Date.now() + path.extname(file.originalname));
+		}
+	});
+
+const upload = multer({ 
+	storage: storage,
+	limits: {
+		fileSize: fileSizeMb * 1024 * 1024,
+	},
+	fileFilter: (req, file, cb) => {
+	
+		const filetypes = new RegExp(fileExtension);
+		const extname 	= filetypes.test(path.extname(file.originalname).toLowerCase());
+		const mimetype  = filetypes.test(file.mimetype);
+
+		if(mimetype && extname){
+			return cb(null,true);
+		}
+		else {
+			 cb(new Error(notifyConfig.ERROR_FILE_EXTENSION));
+		}
+	}
+}).array(field);
+return upload;
+
+}
+
+module.exports = {
+	upload: uploadFile,
+	remove: removeFile,
+	uploadFileSetting: uploadFileSetting,
+	removeFileSetting: removeFileSetting,
+	uploadFileMulti: uploadFileMulti,
 }
