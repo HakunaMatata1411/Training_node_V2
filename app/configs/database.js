@@ -1,7 +1,7 @@
 module.exports = {
-    USER_NAME: 'nguyenan22021996',
-    PASSWORD: '2411996An',
-    DATABASE_NAME:'cluster0.ubyknfq.mongodb.net' + '/' + 'project',
+    USER_NAME: 'quocnguyen',
+    PASSWORD: 'sKpbdGm8avDeI2GJ',
+    DATABASE_NAME:'mydb.f9ll1ny.mongodb.net' + '/' + 'project',
     COL_ITEMS: 'objectTable',
     COL_GROUPS: 'groups',
     COL_USERS: 'users',
